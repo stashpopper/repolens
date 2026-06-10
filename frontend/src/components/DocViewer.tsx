@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getDocs, downloadDocs } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -86,9 +86,9 @@ export function DocViewer({ analysisId }: DocViewerProps) {
 
   if (docList.length === 0) {
     return (
-      <Alert>
+      <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>No documentation generated yet.</AlertDescription>
+        <AlertDescription>The AI failed to generate documentation. The analysis may have encountered an error.</AlertDescription>
       </Alert>
     );
   }

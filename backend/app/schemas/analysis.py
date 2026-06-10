@@ -7,9 +7,10 @@ class AnalyzeRequest(BaseModel):
     """Request to start a codebase analysis."""
     repo_url: Optional[str] = None  # GitHub URL
     local_path: Optional[str] = None  # Local directory path
-    llm_provider: str = "openai"  # openai, anthropic, ollama
+    llm_provider: str = "openai"  # openai, anthropic, mistral, ollama
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
+    mistral_api_key: Optional[str] = None
     github_token: Optional[str] = None
 
     def model_post_init(self, __context):

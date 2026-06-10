@@ -2,6 +2,7 @@
 
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+from langchain_mistralai import ChatMistralAI
 from langchain_core.language_models import BaseChatModel
 from typing import Optional
 import logging
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_MODELS = {
     "openai": "gpt-4o",
     "anthropic": "claude-sonnet-4-20250514",
+    "mistral": "labs-leanstral-2603",
     "ollama": "llama3.1",
 }
 
@@ -49,6 +51,14 @@ class LLMService:
         elif provider == "anthropic":
             key = api_key or None
             return ChatAnthropic(
+                model=model_name,
+                api_key=key,
+                temperature=0,
+                max_tokens=8192,
+            )
+        elif provider == "mistral":
+            key = api_key or None
+            return ChatMistralAI(
                 model=model_name,
                 api_key=key,
                 temperature=0,

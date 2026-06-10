@@ -7,6 +7,7 @@ from app.schemas.analysis import AnalyzeRequest, AnalysisStatus, LogEntry, Analy
 from app.services.supabase_service import SupabaseService
 from app.services.storage import StorageService
 from app.agents.codebase_analyzer import build_analyzer_graph, AnalysisState
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["analysis"])
@@ -19,13 +20,23 @@ def run_analysis(analysis_id: str, request: AnalyzeRequest):
         SupabaseService.update_analysis(analysis_id, {"status": "running"})
         SupabaseService.add_log_entry(analysis_id, 0, "Analysis started")
 
-        # Build initial state
+        # Build initial state — use env var API keys as fallback
+        api_key = request.openai_api_key or request.anthropic_api_key or request.mistral_api_key
+        if not api_key:
+            if request.llm_provider == "openai":
+                api_key = settings.openai_api_key or ""
+            elif request.llm_provider == "anthropic":
+                api_key = settings.anthropic_api_key or ""
+            elif request.llm_provider == "mistral":
+                api_key = settings.mistral_api_key or ""
+
         initial_state: AnalysisState = {
-            "repo_url": analysis_id,
+            "analysis_id": analysis_id,
+            "repo_url": request.repo_url or request.local_path or "",
             "local_path": request.local_path,
             "llm_provider": request.llm_provider,
-            "api_key": request.openai_api_key or request.anthropic_api_key,
-            "github_token": request.github_token,
+            "api_key": api_key,
+            "github_token": request.github_token or settings.github_token or "",
             "repo_path": "",
             "file_list": [],
             "tech_stack": {},
@@ -39,8 +50,14 @@ def run_analysis(analysis_id: str, request: AnalyzeRequest):
 
         # Run the LangGraph pipeline
         graph = build_analyzer_graph()
-        graph.invoke(initial_state)
+        final_state = graph.invoke(initial_state)
 
+        # Update status to completed with generated docs
+        docs = final_state.get("generated_docs", {})
+        SupabaseService.update_analysis(
+            analysis_id,
+            {"status": "completed", "generated_docs": docs},
+        )
         SupabaseService.add_log_entry(analysis_id, 6, "Analysis completed successfully")
 
     except Exception as e:
@@ -88,16 +105,22 @@ async def get_status(analysis_id: str):
     if not record:
         raise HTTPException(status_code=404, detail="Analysis not found")
 
-    return AnalysisStatus(
-        id=record["id"],
-        status=record["status"],
-        current_phase=record["current_phase"],
-        progress=record["progress"],
-        file_count=record["file_count"],
-        tech_stack=record.get("tech_stack"),
-        created_at=record["created_at"],
-        error=record.get("error"),
-    )
+    # Build response including generated_docs if available
+    response_data = {
+        "id": record["id"],
+        "status": record["status"],
+        "current_phase": record.get("current_phase", 0),
+        "progress": record.get("progress", 0),
+        "file_count": record.get("file_count", 0),
+        "tech_stack": record.get("tech_stack"),
+        "created_at": record["created_at"],
+        "error": record.get("error"),
+    }
+    # Include generated_docs if analysis is complete
+    if record.get("generated_docs"):
+        response_data["generated_docs"] = record["generated_docs"]
+
+    return response_data
 
 
 @router.get("/logs/{analysis_id}")
@@ -116,15 +139,16 @@ async def get_docs(analysis_id: str):
 
     docs = record.get("generated_docs", {})
     if not docs:
-        raise HTTPException(status_code=202, detail="Docs not yet generated. Analysis may still be running.")
+        raise HTTPException(status_code=500, detail="AI failed to generate documentation.")
 
     # Load doc contents from storage
     storage = StorageService()
     result = {}
     for filename in docs:
         content = storage.get_doc(analysis_id, filename)
-        if content:
-            result[filename] = content
+        if not content:
+            raise HTTPException(status_code=500, detail=f"Failed to read generated doc: {filename}")
+        result[filename] = content
 
     return result
 

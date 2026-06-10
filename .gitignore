@@ -38,3 +38,5 @@ TODO.md
 
 # Supabase
 supabase.txt
+supabase/.temp/
+!supabase/migrations/

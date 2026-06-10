@@ -7,15 +7,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Github, FolderOpen, Loader2 } from "lucide-react";
 
 interface RepoInputProps {
-  onSubmit: (repoUrl: string, localPath: string, llmProvider: string, apiKey: string, githubToken: string) => void;
+  onSubmit: (repoUrl: string, localPath: string, llmProvider: string, githubToken: string) => void;
   isLoading: boolean;
 }
 
 export function RepoInput({ onSubmit, isLoading }: RepoInputProps) {
   const [repoUrl, setRepoUrl] = useState("");
   const [localPath, setLocalPath] = useState("");
-  const [llmProvider, setLlmProvider] = useState("openai");
-  const [apiKey, setApiKey] = useState("");
+  const [llmProvider] = useState("mistral");
   const [githubToken, setGithubToken] = useState("");
   const [error, setError] = useState("");
 
@@ -31,21 +30,10 @@ export function RepoInput({ onSubmit, isLoading }: RepoInputProps) {
       return;
     }
 
-    if (llmProvider === "openai" && !apiKey.trim()) {
-      setError("Please enter your OpenAI API key.");
-      return;
-    }
-
-    if (llmProvider === "anthropic" && !apiKey.trim()) {
-      setError("Please enter your Anthropic API key.");
-      return;
-    }
-
     onSubmit(
       isGitHub ? repoUrl.trim() : "",
       isLocal ? localPath.trim() : "",
       llmProvider,
-      apiKey.trim(),
       githubToken.trim()
     );
   };
@@ -112,29 +100,14 @@ export function RepoInput({ onSubmit, isLoading }: RepoInputProps) {
               <label className="text-sm font-medium">LLM Provider</label>
               <select
                 value={llmProvider}
-                onChange={(e) => setLlmProvider(e.target.value)}
+                onChange={() => {}}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                disabled
               >
-                <option value="openai">OpenAI (GPT-4o)</option>
-                <option value="anthropic">Anthropic (Claude)</option>
-                <option value="ollama">Ollama (local)</option>
+                <option value="mistral">Mistral AI</option>
               </select>
+              <p className="text-xs text-muted-foreground">Powered by Mistral AI</p>
             </div>
-
-            {llmProvider !== "ollama" && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">API Key</label>
-                <Input
-                  type="password"
-                  placeholder={llmProvider === "openai" ? "sk-..." : "sk-ant-..."}
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Your key is used only for this session and not stored.
-                </p>
-              </div>
-            )}
           </div>
 
           {error && (

@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     # LLM Providers (user provides at runtime, but defaults here)
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
+    mistral_api_key: Optional[str] = None
+    mistral_model: str = "labs-leanstral-2603"
 
     # Analysis limits
     max_repo_size_mb: int = 100

@@ -1,8 +1,9 @@
 """FastAPI application — RepoLens backend entry point."""
 
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api.analyze import router as analyze_router
 from app.api.download import router as download_router
@@ -10,7 +11,7 @@ from app.config import settings
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
@@ -29,6 +30,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Catch-all: ensure CORS headers on ALL responses including errors
+@app.middleware("http")
+async def ensure_cors_on_errors(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
 
 # Register routers
 app.include_router(analyze_router)

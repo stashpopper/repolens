@@ -4,8 +4,6 @@ export interface AnalyzeRequest {
   repo_url?: string;
   local_path?: string;
   llm_provider?: string;
-  openai_api_key?: string;
-  anthropic_api_key?: string;
   github_token?: string;
 }
 
@@ -61,10 +59,7 @@ export async function getLogs(analysisId: string): Promise<LogEntry[]> {
 
 export async function getDocs(analysisId: string): Promise<Record<string, string>> {
   const response = await fetch(`${API_BASE}/api/docs/${analysisId}`);
-  if (!response.ok) {
-    if (response.status === 202) return {};
-    throw new Error(`Failed to get docs: ${response.statusText}`);
-  }
+  if (!response.ok) throw new Error(`Failed to get docs: ${response.statusText}`);
   return response.json();
 }
 

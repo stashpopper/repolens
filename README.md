@@ -5,18 +5,19 @@ An AI-powered codebase explainer that systematically analyzes GitHub repos and g
 ## Features
 
 - **GitHub URL or Local Directory** input
-- **Step-by-step analysis** via LangGraph agent pipeline
-- **Multi-file documentation** output (Architecture, Components, Routing, Data Flow, etc.)
-- **Configurable LLM** — use OpenAI, Anthropic, or any LangChain-compatible provider
+- **Step-by-step analysis** via LangGraph agent pipeline (6 phases)
+- **Multi-file documentation** output (Overview, File Breakdown, Data Flow, API Endpoints, Dependency Map, Glossary)
+- **Mistral AI** — powered by `labs-leanstral-2603` model
+- **Real-time progress** tracking via Supabase
 - **Beautiful React UI** with shadcn/ui
 
 ## Tech Stack
 
 - **Frontend:** React + Vite + shadcn/ui + Tailwind CSS
 - **Backend:** Python + FastAPI
-- **Agent Framework:** LangGraph
-- **Database:** Supabase (PostgreSQL)
-- **LLM:** Configurable (OpenAI / Anthropic / etc.)
+- **Agent Framework:** LangGraph (StateGraph with 6 phased nodes)
+- **Database:** Supabase (PostgreSQL) — `analyses` + `analysis_logs` tables
+- **LLM:** Mistral AI (`labs-leanstral-2603`) — configurable at runtime
 
 ## Setup
 
