@@ -35,3 +35,6 @@ TODO.md
 .env.local
 *.key
 *.pem
+
+# Supabase
+supabase.txt

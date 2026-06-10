@@ -1,0 +1,30 @@
+# Web Framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# LangChain / LangGraph
+langchain==0.3.13
+langchain-openai==0.3.5
+langchain-anthropic==0.3.5
+langgraph==0.2.68
+langchain-core==0.3.30
+
+# Supabase
+supabase==2.13.0
+
+# Repo handling
+gitpython==3.1.44
+PyGithub==2.5.0
+
+# Utilities
+python-dotenv==1.0.1
+pydantic==2.10.4
+pydantic-settings==2.7.1
+httpx==0.28.1
+python-multipart==0.0.20
+aiofiles==24.1.0
+zipfile36==0.0.3
+
+# Optional: for better code parsing
+tree-sitter==0.23.2
+tree-sitter-languages==1.10.2
