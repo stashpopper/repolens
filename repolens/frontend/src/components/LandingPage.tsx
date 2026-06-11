@@ -8,21 +8,40 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-/* ── Animated SVG: Network Graph (Hero) ── */
-function NetworkAnimation() {
+/* ── Animated SVG: Repo → AI → Docs Pipeline (Hero) ── */
+function RepoLensPipeline() {
   return (
     <svg viewBox="0 0 600 400" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="repoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#2563eb" />
+        </linearGradient>
+        <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#8b5cf6" />
+          <stop offset="100%" stopColor="#7c3aed" />
+        </linearGradient>
+        <linearGradient id="docsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#06b6d4" />
+          <stop offset="100%" stopColor="#0891b2" />
+        </linearGradient>
+        <linearGradient id="flowGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#3b82f6" />
           <stop offset="100%" stopColor="#8b5cf6" />
         </linearGradient>
-        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.6" />
+        <linearGradient id="flowGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#8b5cf6" />
+          <stop offset="100%" stopColor="#06b6d4" />
         </linearGradient>
         <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="softGlow">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
             <feMergeNode in="SourceGraphic"/>
@@ -30,94 +49,158 @@ function NetworkAnimation() {
         </filter>
       </defs>
 
-      {/* Connection lines */}
-      <g opacity="0.4">
-        <line x1="300" y1="200" x2="150" y2="100" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="6 4">
-          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3s" repeatCount="indefinite" />
-        </line>
-        <line x1="300" y1="200" x2="450" y2="100" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="6 4">
-          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3.5s" repeatCount="indefinite" />
-        </line>
-        <line x1="300" y1="200" x2="150" y2="300" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="6 4">
-          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2.8s" repeatCount="indefinite" />
-        </line>
-        <line x1="300" y1="200" x2="450" y2="300" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="6 4">
-          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3.2s" repeatCount="indefinite" />
-        </line>
-        <line x1="150" y1="100" x2="100" y2="200" stroke="url(#lineGrad)" strokeWidth="1" strokeDasharray="4 4">
-          <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.5s" repeatCount="indefinite" />
-        </line>
-        <line x1="450" y1="100" x2="500" y2="200" stroke="url(#lineGrad)" strokeWidth="1" strokeDasharray="4 4">
-          <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.7s" repeatCount="indefinite" />
-        </line>
-        <line x1="150" y1="300" x2="100" y2="200" stroke="url(#lineGrad)" strokeWidth="1" strokeDasharray="4 4">
-          <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.6s" repeatCount="indefinite" />
-        </line>
-        <line x1="450" y1="300" x2="500" y2="200" stroke="url(#lineGrad)" strokeWidth="1" strokeDasharray="4 4">
-          <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.9s" repeatCount="indefinite" />
-        </line>
-        <line x1="150" y1="100" x2="450" y2="100" stroke="url(#lineGrad)" strokeWidth="0.8" strokeDasharray="3 6" opacity="0.5">
-          <animate attributeName="stroke-dashoffset" from="80" to="0" dur="4s" repeatCount="indefinite" />
-        </line>
-        <line x1="150" y1="300" x2="450" y2="300" stroke="url(#lineGrad)" strokeWidth="0.8" strokeDasharray="3 6" opacity="0.5">
-          <animate attributeName="stroke-dashoffset" from="80" to="0" dur="4.2s" repeatCount="indefinite" />
-        </line>
+      {/* ── LEFT: Repository Card ── */}
+      <g transform="translate(40, 60)" filter="url(#softGlow)">
+        {/* Card bg */}
+        <rect x="0" y="0" width="160" height="280" rx="12" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.25)" strokeWidth="1.5">
+          <animate attributeName="stroke-opacity" values="0.25;0.5;0.25" dur="4s" repeatCount="indefinite" />
+        </rect>
+        {/* Header */}
+        <rect x="0" y="0" width="160" height="40" rx="12" fill="rgba(59,130,246,0.12)" />
+        <rect x="0" y="24" width="160" height="16" fill="rgba(59,130,246,0.12)" />
+        {/* Folder icon */}
+        <rect x="20" y="12" width="16" height="14" rx="3" fill="none" stroke="#60a5fa" strokeWidth="1.5" />
+        <path d="M20,16 L24,16 L25,14 L42,14 C43.1,14 44,14.9 44,16 L44,26 C44,27.1 43.1,28 42,28 L22,28 C20.9,28 20,27.1 20,26 Z" fill="rgba(59,130,246,0.25)" stroke="#60a5fa" strokeWidth="1" />
+        <text x="44" y="23" fill="#93c5fd" fontSize="11" fontWeight="600">my-project</text>
+        {/* File tree */}
+        <g transform="translate(14, 52)">
+          {/* src/ */}
+          <rect x="0" y="0" width="10" height="10" rx="2" fill="rgba(59,130,246,0.2)" stroke="#60a5fa" strokeWidth="0.8" />
+          <text x="16" y="9" fill="#93c5fd" fontSize="9" fontFamily="monospace">src/</text>
+          {/* components/ */}
+          <rect x="20" y="18" width="10" height="10" rx="2" fill="rgba(59,130,246,0.15)" stroke="#60a5fa" strokeWidth="0.8" />
+          <text x="36" y="27" fill="#93c5fd" fontSize="9" fontFamily="monospace">components/</text>
+          {/* files */}
+          <text x="40" y="45" fill="#60a5fa" fontSize="8" fontFamily="monospace">├─ App.tsx</text>
+          <text x="40" y="58" fill="#60a5fa" fontSize="8" fontFamily="monospace">├─ Header.tsx</text>
+          <text x="40" y="71" fill="#60a5fa" fontSize="8" fontFamily="monospace">└─ utils.ts</text>
+          {/* backend/ */}
+          <rect x="0" y="84" width="10" height="10" rx="2" fill="rgba(59,130,246,0.15)" stroke="#60a5fa" strokeWidth="0.8" />
+          <text x="16" y="93" fill="#93c5fd" fontSize="9" fontFamily="monospace">api/</text>
+          <text x="20" y="111" fill="#60a5fa" fontSize="8" fontFamily="monospace">├─ routes.py</text>
+          <text x="20" y="124" fill="#60a5fa" fontSize="8" fontFamily="monospace">├─ models.py</text>
+          <text x="20" y="137" fill="#60a5fa" fontSize="8" fontFamily="monospace">└─ db.py</text>
+          {/* config */}
+          <text x="4" y="157" fill="#93c5fd" fontSize="8" fontFamily="monospace">📄 package.json</text>
+          <text x="4" y="170" fill="#93c5fd" fontSize="8" fontFamily="monospace">📄 config.yaml</text>
+        </g>
+        {/* Label */}
+        <text x="80" y="270" textAnchor="middle" fill="#60a5fa" fontSize="10" fontWeight="600">Repository</text>
       </g>
 
-      {/* Center node */}
-      <circle cx="300" cy="200" r="18" fill="url(#nodeGrad)" filter="url(#glow)">
-        <animate attributeName="r" values="16;20;16" dur="3s" repeatCount="indefinite" />
-      </circle>
-      <circle cx="300" cy="200" r="30" fill="none" stroke="#3b82f6" strokeWidth="0.5" opacity="0.3">
-        <animate attributeName="r" values="25;35;25" dur="3s" repeatCount="indefinite" />
-        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="3s" repeatCount="indefinite" />
-      </circle>
-
-      {/* Primary nodes */}
-      {[
-        { cx: 150, cy: 100 }, { cx: 450, cy: 100 },
-        { cx: 150, cy: 300 }, { cx: 450, cy: 300 }
-      ].map((n, i) => (
-        <g key={`primary-${i}`}>
-          <circle cx={n.cx} cy={n.cy} r="10" fill="url(#nodeGrad)" opacity="0.8" filter="url(#glow)">
-            <animate attributeName="r" values="8;12;8" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
-          </circle>
-          <circle cx={n.cx} cy={n.cy} r="16" fill="none" stroke="#3b82f6" strokeWidth="0.5" opacity="0.2">
-            <animate attributeName="r" values="14;20;14" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
-          </circle>
-        </g>
-      ))}
-
-      {/* Secondary nodes */}
-      {[
-        { cx: 100, cy: 200 }, { cx: 500, cy: 200 },
-        { cx: 300, cy: 80 }, { cx: 300, cy: 320 }
-      ].map((n, i) => (
-        <circle key={`secondary-${i}`} cx={n.cx} cy={n.cy} r="6" fill="#8b5cf6" opacity="0.6">
-          <animate attributeName="r" values="5;7;5" dur={`${2.5 + i * 0.2}s`} repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.6;0.3;0.6" dur={`${2.5 + i * 0.2}s`} repeatCount="indefinite" />
+      {/* ── FLOW ARROW 1: Repo → AI ── */}
+      <g>
+        <line x1="200" y1="200" x2="245" y2="200" stroke="url(#flowGrad1)" strokeWidth="2" strokeDasharray="6 4" opacity="0.7">
+          <animate attributeName="stroke-dashoffset" from="20" to="0" dur="1.5s" repeatCount="indefinite" />
+        </line>
+        {/* Arrowhead */}
+        <polygon points="245,196 255,200 245,204" fill="#8b5cf6" opacity="0.8">
+          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite" />
+        </polygon>
+        {/* Flow particles */}
+        <circle r="3" fill="#60a5fa" filter="url(#glow)">
+          <animateMotion dur="2s" repeatCount="indefinite" path="M200,200 L250,200" />
         </circle>
-      ))}
+        <circle r="2" fill="#818cf8" filter="url(#glow)">
+          <animateMotion dur="2s" begin="0.7s" repeatCount="indefinite" path="M200,200 L250,200" />
+        </circle>
+      </g>
 
-      {/* Data flow particles */}
-      <circle r="3" fill="#60a5fa" filter="url(#glow)">
-        <animateMotion dur="3s" repeatCount="indefinite" path="M300,200 L150,100" />
-      </circle>
-      <circle r="3" fill="#a78bfa" filter="url(#glow)">
-        <animateMotion dur="3.5s" repeatCount="indefinite" path="M300,200 L450,100" />
-      </circle>
-      <circle r="3" fill="#60a5fa" filter="url(#glow)">
-        <animateMotion dur="2.8s" repeatCount="indefinite" path="M300,200 L150,300" />
-      </circle>
-      <circle r="3" fill="#a78bfa" filter="url(#glow)">
-        <animateMotion dur="3.2s" repeatCount="indefinite" path="M300,200 L450,300" />
-      </circle>
-      <circle r="2" fill="#60a5fa" filter="url(#glow)">
-        <animateMotion dur="2.5s" repeatCount="indefinite" path="M150,100 L100,200" />
-      </circle>
-      <circle r="2" fill="#a78bfa" filter="url(#glow)">
-        <animateMotion dur="2.7s" repeatCount="indefinite" path="M450,100 L500,200" />
-      </circle>
+      {/* ── CENTER: AI Analysis Hub ── */}
+      <g transform="translate(300, 200)">
+        {/* Outer rings */}
+        <circle r="65" fill="none" stroke="rgba(139,92,246,0.1)" strokeWidth="1">
+          <animate attributeName="r" values="60;70;60" dur="4s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.15;0.05;0.15" dur="4s" repeatCount="indefinite" />
+        </circle>
+        <circle r="52" fill="none" stroke="rgba(139,92,246,0.15)" strokeWidth="1" strokeDasharray="4 4">
+          <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="20s" repeatCount="indefinite" />
+        </circle>
+        <circle r="42" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.2)" strokeWidth="1">
+          <animate attributeName="r" values="40;45;40" dur="3s" repeatCount="indefinite" />
+        </circle>
+        {/* Core */}
+        <circle r="30" fill="url(#aiGrad)" filter="url(#glow)">
+          <animate attributeName="r" values="28;32;28" dur="3s" repeatCount="indefinite" />
+        </circle>
+        {/* Brain icon */}
+        <path d="M-8,-4 C-8,-10 -2,-14 4,-12 C8,-14 14,-10 14,-4 C18,-2 18,6 14,8 C14,14 8,16 4,14 C-2,16 -8,14 -8,8 C-12,6 -12,-2 -8,-4 Z" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" strokeWidth="1" />
+        <circle cx="0" cy="0" r="4" fill="rgba(255,255,255,0.9)">
+          <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" />
+        </circle>
+        {/* Processing labels */}
+        <text x="0" y="75" textAnchor="middle" fill="#a78bfa" fontSize="10" fontWeight="600">AI Analysis</text>
+        <text x="0" y="90" textAnchor="middle" fill="#7c3aed" fontSize="8" fontFamily="monospace">6-phase pipeline</text>
+        {/* Scanning arcs */}
+        <path d="M-25,-25 A35,35 0 0,1 25,-25" fill="none" stroke="#a78bfa" strokeWidth="1.5" opacity="0">
+          <animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite" />
+        </path>
+        <path d="M-25,25 A35,35 0 0,0 25,25" fill="none" stroke="#60a5fa" strokeWidth="1.5" opacity="0">
+          <animate attributeName="opacity" values="0;0;0.6;0" dur="3s" repeatCount="indefinite" />
+        </path>
+      </g>
+
+      {/* ── FLOW ARROW 2: AI → Docs ── */}
+      <g>
+        <line x1="355" y1="200" x2="400" y2="200" stroke="url(#flowGrad2)" strokeWidth="2" strokeDasharray="6 4" opacity="0.7">
+          <animate attributeName="stroke-dashoffset" from="20" to="0" dur="1.5s" repeatCount="indefinite" />
+        </line>
+        <polygon points="400,196 410,200 400,204" fill="#06b6d4" opacity="0.8">
+          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite" />
+        </polygon>
+        <circle r="3" fill="#a78bfa" filter="url(#glow)">
+          <animateMotion dur="2s" repeatCount="indefinite" path="M350,200 L400,200" />
+        </circle>
+        <circle r="2" fill="#22d3ee" filter="url(#glow)">
+          <animateMotion dur="2s" begin="0.7s" repeatCount="indefinite" path="M350,200 L400,200" />
+        </circle>
+      </g>
+
+      {/* ── RIGHT: Documentation Card ── */}
+      <g transform="translate(420, 60)" filter="url(#softGlow)">
+        {/* Card bg */}
+        <rect x="0" y="0" width="140" height="280" rx="12" fill="rgba(6,182,212,0.06)" stroke="rgba(6,182,212,0.25)" strokeWidth="1.5">
+          <animate attributeName="stroke-opacity" values="0.25;0.5;0.25" dur="4s" begin="1s" repeatCount="indefinite" />
+        </rect>
+        {/* Header */}
+        <rect x="0" y="0" width="140" height="40" rx="12" fill="rgba(6,182,212,0.12)" />
+        <rect x="0" y="24" width="140" height="16" fill="rgba(6,182,212,0.12)" />
+        {/* Document icon */}
+        <rect x="16" y="10" width="12" height="16" rx="2" fill="none" stroke="#22d3ee" strokeWidth="1.2" />
+        <line x1="20" y1="16" x2="24" y2="16" stroke="#22d3ee" strokeWidth="0.8" />
+        <line x1="20" y1="20" x2="24" y2="20" stroke="#22d3ee" strokeWidth="0.8" />
+        <text x="34" y="23" fill="#67e8f9" fontSize="11" fontWeight="600">docs.md</text>
+        {/* Doc content */}
+        <g transform="translate(12, 52)">
+          {/* Overview section */}
+          <text x="0" y="0" fill="#22d3ee" fontSize="9" fontWeight="700"># Overview</text>
+          <rect x="0" y="8" width="110" height="3" rx="1.5" fill="rgba(6,182,212,0.3)" />
+          <rect x="0" y="15" width="95" height="3" rx="1.5" fill="rgba(6,182,212,0.2)" />
+          <rect x="0" y="22" width="100" height="3" rx="1.5" fill="rgba(6,182,212,0.25)" />
+          {/* Architecture */}
+          <text x="0" y="42" fill="#22d3ee" fontSize="9" fontWeight="700">## Architecture</text>
+          <rect x="0" y="50" width="105" height="3" rx="1.5" fill="rgba(6,182,212,0.3)" />
+          <rect x="0" y="57" width="88" height="3" rx="1.5" fill="rgba(6,182,212,0.2)" />
+          <rect x="0" y="64" width="98" height="3" rx="1.5" fill="rgba(6,182,212,0.25)" />
+          {/* Data Flow */}
+          <text x="0" y="84" fill="#22d3ee" fontSize="9" fontWeight="700">## Data Flow</text>
+          <rect x="0" y="92" width="110" height="3" rx="1.5" fill="rgba(6,182,212,0.3)" />
+          <rect x="0" y="99" width="92" height="3" rx="1.5" fill="rgba(6,182,212,0.2)" />
+          <rect x="0" y="106" width="105" height="3" rx="1.5" fill="rgba(6,182,212,0.25)" />
+          {/* API */}
+          <text x="0" y="126" fill="#22d3ee" fontSize="9" fontWeight="700">## API Endpoints</text>
+          <rect x="0" y="134" width="100" height="3" rx="1.5" fill="rgba(6,182,212,0.3)" />
+          <rect x="0" y="141" width="85" height="3" rx="1.5" fill="rgba(6,182,212,0.2)" />
+          <rect x="0" y="148" width="95" height="3" rx="1.5" fill="rgba(6,182,212,0.25)" />
+          {/* Checkmarks */}
+          <text x="0" y="172" fill="#34d399" fontSize="8">✓ 23 files analyzed</text>
+          <text x="0" y="184" fill="#34d399" fontSize="8">✓ Architecture mapped</text>
+          <text x="0" y="196" fill="#34d399" fontSize="8">✓ Data flows traced</text>
+          <text x="0" y="208" fill="#34d399" fontSize="8">✓ Glossary: 42 terms</text>
+        </g>
+        {/* Label */}
+        <text x="70" y="270" textAnchor="middle" fill="#22d3ee" fontSize="10" fontWeight="600">Documentation</text>
+      </g>
     </svg>
   );
 }
@@ -561,7 +644,7 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
               
               {/* SVG animation */}
               <div className="absolute inset-0">
-                <NetworkAnimation />
+                <RepoLensPipeline />
               </div>
 
               {/* Floating badges */}
