@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   ArrowRight, Sparkles, Zap, Layers, FileText, GitBranch, 
-  Cpu, Globe, ChevronRight, Star, Play, CheckCircle2, 
-  Github, MessageSquare, Shield, BarChart3, Code2, Terminal,
+  Cpu, Globe, ChevronRight, Play, CheckCircle2, 
+  Github, Shield, BarChart3, Code2, Terminal,
   Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -205,78 +205,6 @@ function RepoLensPipeline() {
   );
 }
 
-/* ── Animated SVG: Code Analysis (Features) ── */
-function CodeAnalysisAnimation() {
-  return (
-    <svg viewBox="0 0 400 300" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="codeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#3b82f6" />
-          <stop offset="100%" stopColor="#06b6d4" />
-        </linearGradient>
-      </defs>
-
-      {/* Code blocks */}
-      <rect x="30" y="30" width="140" height="90" rx="8" fill="rgba(59,130,246,0.1)" stroke="#3b82f6" strokeWidth="1" opacity="0.7">
-        <animate attributeName="opacity" values="0.7;0.4;0.7" dur="4s" repeatCount="indefinite" />
-      </rect>
-      <rect x="35" y="40" width="60" height="4" rx="2" fill="#3b82f6" opacity="0.6" />
-      <rect x="35" y="50" width="90" height="4" rx="2" fill="#3b82f6" opacity="0.4" />
-      <rect x="45" y="60" width="70" height="4" rx="2" fill="#3b82f6" opacity="0.5" />
-      <rect x="45" y="70" width="80" height="4" rx="2" fill="#3b82f6" opacity="0.3" />
-      <rect x="35" y="80" width="50" height="4" rx="2" fill="#3b82f6" opacity="0.4" />
-      <rect x="35" y="90" width="100" height="4" rx="2" fill="#3b82f6" opacity="0.5" />
-
-      {/* AI processing */}
-      <g transform="translate(200, 75)">
-        <circle r="35" fill="rgba(139,92,246,0.15)">
-          <animate attributeName="r" values="30;38;30" dur="3s" repeatCount="indefinite" />
-        </circle>
-        <circle r="25" fill="url(#codeGrad)" opacity="0.3">
-          <animate attributeName="r" values="22;28;22" dur="3s" repeatCount="indefinite" />
-        </circle>
-        <text x="0" y="5" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">AI</text>
-      </g>
-
-      {/* Arrow from code to AI */}
-      <line x1="170" y1="75" x2="185" y2="75" stroke="#3b82f6" strokeWidth="1.5" markerEnd="url(#arrowhead)">
-        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
-      </line>
-
-      {/* Documentation blocks */}
-      <rect x="230" y="180" width="140" height="90" rx="8" fill="rgba(6,182,212,0.1)" stroke="#06b6d4" strokeWidth="1" opacity="0.7">
-        <animate attributeName="opacity" values="0.4;0.7;0.4" dur="4s" repeatCount="indefinite" />
-      </rect>
-      <rect x="240" y="192" width="80" height="4" rx="2" fill="#06b6d4" opacity="0.6" />
-      <rect x="240" y="202" width="110" height="4" rx="2" fill="#06b6d4" opacity="0.4" />
-      <rect x="240" y="212" width="90" height="4" rx="2" fill="#06b6d4" opacity="0.5" />
-      <rect x="240" y="222" width="100" height="4" rx="2" fill="#06b6d4" opacity="0.3" />
-      <rect x="240" y="232" width="70" height="4" rx="2" fill="#06b6d4" opacity="0.4" />
-      <rect x="240" y="242" width="120" height="4" rx="2" fill="#06b6d4" opacity="0.5" />
-
-      {/* Arrow from AI to docs */}
-      <line x1="200" y1="115" x2="230" y2="175" stroke="#8b5cf6" strokeWidth="1.5" strokeDasharray="4 3">
-        <animate attributeName="stroke-dashoffset" from="20" to="0" dur="2s" repeatCount="indefinite" />
-      </line>
-
-      {/* Second code block */}
-      <rect x="30" y="160" width="140" height="90" rx="8" fill="rgba(59,130,246,0.1)" stroke="#3b82f6" strokeWidth="1" opacity="0.5">
-        <animate attributeName="opacity" values="0.5;0.3;0.5" dur="5s" repeatCount="indefinite" />
-      </rect>
-      <rect x="35" y="170" width="70" height="4" rx="2" fill="#3b82f6" opacity="0.4" />
-      <rect x="35" y="180" width="100" height="4" rx="2" fill="#3b82f6" opacity="0.3" />
-      <rect x="45" y="190" width="60" height="4" rx="2" fill="#3b82f6" opacity="0.5" />
-      <rect x="45" y="200" width="85" height="4" rx="2" fill="#3b82f6" opacity="0.4" />
-      <rect x="35" y="210" width="55" height="4" rx="2" fill="#3b82f6" opacity="0.3" />
-
-      {/* Arrow from code2 to AI */}
-      <line x1="170" y1="205" x2="185" y2="115" stroke="#3b82f6" strokeWidth="1" strokeDasharray="4 3">
-        <animate attributeName="stroke-dashoffset" from="20" to="0" dur="2.5s" repeatCount="indefinite" />
-      </line>
-    </svg>
-  );
-}
-
 /* ── Animated SVG: Orbiting planets (How it works) ── */
 function OrbitAnimation() {
   return (
@@ -445,67 +373,6 @@ function FeatureCard({ icon: Icon, title, description, delay }: { icon: any; tit
   );
 }
 
-/* ── Stat Counter ── */
-function StatCounter({ value, label, suffix = "" }: { value: number; label: string; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const { ref, inView } = useInView();
-
-  useEffect(() => {
-    if (!inView) return;
-    let start = 0;
-    const step = Math.ceil(value / 40);
-    const interval = setInterval(() => {
-      start += step;
-      if (start >= value) {
-        setCount(value);
-        clearInterval(interval);
-      } else {
-        setCount(start);
-      }
-    }, 30);
-    return () => clearInterval(interval);
-  }, [inView, value]);
-
-  return (
-    <div ref={ref} className="text-center">
-      <div className="text-4xl font-bold text-white mb-1">
-        {count.toLocaleString()}{suffix}
-      </div>
-      <div className="text-sm text-muted-foreground">{label}</div>
-    </div>
-  );
-}
-
-/* ── Testimonial Card ── */
-function TestimonialCard({ name, role, content, delay }: { name: string; role: string; content: string; delay: number }) {
-  const { ref, inView } = useInView();
-  return (
-    <div
-      ref={ref}
-      className={`glass rounded-2xl p-6 transition-all duration-700 ${
-        inView ? "animate-fade-in-up" : "opacity-0"
-      }`}
-      style={{ animationDelay: `${delay}ms`, animationFillMode: "backwards" }}
-    >
-      <div className="flex items-center gap-1 mb-3">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-        ))}
-      </div>
-      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">"{content}"</p>
-      <div className="flex items-center gap-3">
-        <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
-          {name[0]}
-        </div>
-        <div>
-          <div className="text-sm font-medium">{name}</div>
-          <div className="text-xs text-muted-foreground">{role}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ── Main Landing Page ── */
 export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -526,12 +393,6 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
     { num: "03", title: "Get Documentation", description: "Receive comprehensive, structured documentation in minutes." },
   ];
 
-  const testimonials = [
-    { name: "Sarah Chen", role: "Senior Engineer at Stripe", content: "RepoLens saved me hours of onboarding time. I dropped in our monolith and got a clear architecture map in minutes." },
-    { name: "Marcus Rivera", role: "Open Source Maintainer", content: "The dependency maps and data flow docs are incredibly accurate. My contributors love the auto-generated docs." },
-    { name: "Aisha Patel", role: "Tech Lead at Vercel", content: "We use RepoLens for every new project acquisition. It's like having a senior architect read your codebase overnight." },
-  ];
-
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* ── Navigation ── */}
@@ -550,7 +411,6 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-muted-foreground hover:text-white transition-colors">Features</a>
             <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-white transition-colors">How It Works</a>
-            <a href="#testimonials" className="text-sm text-muted-foreground hover:text-white transition-colors">Testimonials</a>
             <Button
               onClick={onGetStarted}
               className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white rounded-xl px-6 shadow-lg shadow-blue-500/20"
@@ -571,7 +431,6 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
           <div className="md:hidden glass-strong border-t border-white/5 px-6 py-4 space-y-3">
             <a href="#features" className="block text-sm text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Features</a>
             <a href="#how-it-works" className="block text-sm text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
-            <a href="#testimonials" className="block text-sm text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Testimonials</a>
             <Button onClick={() => { onGetStarted(); setMobileMenuOpen(false); }} className="w-full bg-gradient-to-r from-blue-500 to-violet-500">
               Get Started Free
             </Button>
@@ -671,16 +530,6 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
         </div>
       </section>
 
-      {/* ── Stats Section ── */}
-      <section className="relative py-20 border-y border-white/5 bg-white/[0.01]">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-          <StatCounter value={50000} label="Repos Analyzed" suffix="+" />
-          <StatCounter value={2000} label="Happy Developers" suffix="+" />
-          <StatCounter value={98} label="Accuracy Rate" suffix="%" />
-          <StatCounter value={150} label="Avg. Files/Analysis" suffix="+" />
-        </div>
-      </section>
-
       {/* ── Features Section ── */}
       <section id="features" className="relative py-32 bg-grid">
         <div className="absolute inset-0 overflow-hidden">
@@ -710,12 +559,6 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
             ))}
           </div>
 
-          {/* Code analysis animation */}
-          <div className="glass rounded-2xl p-8 max-w-4xl mx-auto">
-            <div className="aspect-[4/3] max-h-[300px]">
-              <CodeAnalysisAnimation />
-            </div>
-          </div>
         </div>
       </section>
 
@@ -804,27 +647,6 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
         </div>
       </section>
 
-      {/* ── Testimonials ── */}
-      <section id="testimonials" className="relative py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="gap-2 border-primary/30 text-primary mb-4">
-              <MessageSquare className="h-3 w-3" />
-              Loved by Developers
-            </Badge>
-            <h2 className="text-4xl lg:text-5xl font-bold">
-              What People Are Saying
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <TestimonialCard key={i} {...t} delay={i * 150} />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── CTA Section ── */}
       <section className="relative py-32 bg-grid">
         <div className="absolute inset-0 overflow-hidden">
@@ -897,7 +719,6 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#testimonials" className="hover:text-white transition-colors">Testimonials</a></li>
               </ul>
             </div>
             <div>
@@ -918,7 +739,7 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
                 <Github className="h-5 w-5" />
               </a>
               <a href="#" className="text-muted-foreground hover:text-white transition-colors">
-                <MessageSquare className="h-5 w-5" />
+                <Globe className="h-5 w-5" />
               </a>
             </div>
           </div>
