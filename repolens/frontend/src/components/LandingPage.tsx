@@ -1,0 +1,846 @@
+import { useState, useEffect, useRef } from "react";
+import { 
+  ArrowRight, Sparkles, Zap, Layers, FileText, GitBranch, 
+  Cpu, Globe, ChevronRight, Star, Play, CheckCircle2, 
+  Github, MessageSquare, Shield, BarChart3, Code2, Terminal,
+  Menu, X
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+/* ── Animated SVG: Network Graph (Hero) ── */
+function NetworkAnimation() {
+  return (
+    <svg viewBox="0 0 600 400" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#8b5cf6" />
+        </linearGradient>
+        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.6" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Connection lines */}
+      <g opacity="0.4">
+        <line x1="300" y1="200" x2="150" y2="100" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="6 4">
+          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3s" repeatCount="indefinite" />
+        </line>
+        <line x1="300" y1="200" x2="450" y2="100" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="6 4">
+          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3.5s" repeatCount="indefinite" />
+        </line>
+        <line x1="300" y1="200" x2="150" y2="300" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="6 4">
+          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2.8s" repeatCount="indefinite" />
+        </line>
+        <line x1="300" y1="200" x2="450" y2="300" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="6 4">
+          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3.2s" repeatCount="indefinite" />
+        </line>
+        <line x1="150" y1="100" x2="100" y2="200" stroke="url(#lineGrad)" strokeWidth="1" strokeDasharray="4 4">
+          <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.5s" repeatCount="indefinite" />
+        </line>
+        <line x1="450" y1="100" x2="500" y2="200" stroke="url(#lineGrad)" strokeWidth="1" strokeDasharray="4 4">
+          <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.7s" repeatCount="indefinite" />
+        </line>
+        <line x1="150" y1="300" x2="100" y2="200" stroke="url(#lineGrad)" strokeWidth="1" strokeDasharray="4 4">
+          <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.6s" repeatCount="indefinite" />
+        </line>
+        <line x1="450" y1="300" x2="500" y2="200" stroke="url(#lineGrad)" strokeWidth="1" strokeDasharray="4 4">
+          <animate attributeName="stroke-dashoffset" from="60" to="0" dur="2.9s" repeatCount="indefinite" />
+        </line>
+        <line x1="150" y1="100" x2="450" y2="100" stroke="url(#lineGrad)" strokeWidth="0.8" strokeDasharray="3 6" opacity="0.5">
+          <animate attributeName="stroke-dashoffset" from="80" to="0" dur="4s" repeatCount="indefinite" />
+        </line>
+        <line x1="150" y1="300" x2="450" y2="300" stroke="url(#lineGrad)" strokeWidth="0.8" strokeDasharray="3 6" opacity="0.5">
+          <animate attributeName="stroke-dashoffset" from="80" to="0" dur="4.2s" repeatCount="indefinite" />
+        </line>
+      </g>
+
+      {/* Center node */}
+      <circle cx="300" cy="200" r="18" fill="url(#nodeGrad)" filter="url(#glow)">
+        <animate attributeName="r" values="16;20;16" dur="3s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="300" cy="200" r="30" fill="none" stroke="#3b82f6" strokeWidth="0.5" opacity="0.3">
+        <animate attributeName="r" values="25;35;25" dur="3s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="3s" repeatCount="indefinite" />
+      </circle>
+
+      {/* Primary nodes */}
+      {[
+        { cx: 150, cy: 100 }, { cx: 450, cy: 100 },
+        { cx: 150, cy: 300 }, { cx: 450, cy: 300 }
+      ].map((n, i) => (
+        <g key={`primary-${i}`}>
+          <circle cx={n.cx} cy={n.cy} r="10" fill="url(#nodeGrad)" opacity="0.8" filter="url(#glow)">
+            <animate attributeName="r" values="8;12;8" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
+          </circle>
+          <circle cx={n.cx} cy={n.cy} r="16" fill="none" stroke="#3b82f6" strokeWidth="0.5" opacity="0.2">
+            <animate attributeName="r" values="14;20;14" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+
+      {/* Secondary nodes */}
+      {[
+        { cx: 100, cy: 200 }, { cx: 500, cy: 200 },
+        { cx: 300, cy: 80 }, { cx: 300, cy: 320 }
+      ].map((n, i) => (
+        <circle key={`secondary-${i}`} cx={n.cx} cy={n.cy} r="6" fill="#8b5cf6" opacity="0.6">
+          <animate attributeName="r" values="5;7;5" dur={`${2.5 + i * 0.2}s`} repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.6;0.3;0.6" dur={`${2.5 + i * 0.2}s`} repeatCount="indefinite" />
+        </circle>
+      ))}
+
+      {/* Data flow particles */}
+      <circle r="3" fill="#60a5fa" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M300,200 L150,100" />
+      </circle>
+      <circle r="3" fill="#a78bfa" filter="url(#glow)">
+        <animateMotion dur="3.5s" repeatCount="indefinite" path="M300,200 L450,100" />
+      </circle>
+      <circle r="3" fill="#60a5fa" filter="url(#glow)">
+        <animateMotion dur="2.8s" repeatCount="indefinite" path="M300,200 L150,300" />
+      </circle>
+      <circle r="3" fill="#a78bfa" filter="url(#glow)">
+        <animateMotion dur="3.2s" repeatCount="indefinite" path="M300,200 L450,300" />
+      </circle>
+      <circle r="2" fill="#60a5fa" filter="url(#glow)">
+        <animateMotion dur="2.5s" repeatCount="indefinite" path="M150,100 L100,200" />
+      </circle>
+      <circle r="2" fill="#a78bfa" filter="url(#glow)">
+        <animateMotion dur="2.7s" repeatCount="indefinite" path="M450,100 L500,200" />
+      </circle>
+    </svg>
+  );
+}
+
+/* ── Animated SVG: Code Analysis (Features) ── */
+function CodeAnalysisAnimation() {
+  return (
+    <svg viewBox="0 0 400 300" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="codeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#06b6d4" />
+        </linearGradient>
+      </defs>
+
+      {/* Code blocks */}
+      <rect x="30" y="30" width="140" height="90" rx="8" fill="rgba(59,130,246,0.1)" stroke="#3b82f6" strokeWidth="1" opacity="0.7">
+        <animate attributeName="opacity" values="0.7;0.4;0.7" dur="4s" repeatCount="indefinite" />
+      </rect>
+      <rect x="35" y="40" width="60" height="4" rx="2" fill="#3b82f6" opacity="0.6" />
+      <rect x="35" y="50" width="90" height="4" rx="2" fill="#3b82f6" opacity="0.4" />
+      <rect x="45" y="60" width="70" height="4" rx="2" fill="#3b82f6" opacity="0.5" />
+      <rect x="45" y="70" width="80" height="4" rx="2" fill="#3b82f6" opacity="0.3" />
+      <rect x="35" y="80" width="50" height="4" rx="2" fill="#3b82f6" opacity="0.4" />
+      <rect x="35" y="90" width="100" height="4" rx="2" fill="#3b82f6" opacity="0.5" />
+
+      {/* AI processing */}
+      <g transform="translate(200, 75)">
+        <circle r="35" fill="rgba(139,92,246,0.15)">
+          <animate attributeName="r" values="30;38;30" dur="3s" repeatCount="indefinite" />
+        </circle>
+        <circle r="25" fill="url(#codeGrad)" opacity="0.3">
+          <animate attributeName="r" values="22;28;22" dur="3s" repeatCount="indefinite" />
+        </circle>
+        <text x="0" y="5" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">AI</text>
+      </g>
+
+      {/* Arrow from code to AI */}
+      <line x1="170" y1="75" x2="185" y2="75" stroke="#3b82f6" strokeWidth="1.5" markerEnd="url(#arrowhead)">
+        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+      </line>
+
+      {/* Documentation blocks */}
+      <rect x="230" y="180" width="140" height="90" rx="8" fill="rgba(6,182,212,0.1)" stroke="#06b6d4" strokeWidth="1" opacity="0.7">
+        <animate attributeName="opacity" values="0.4;0.7;0.4" dur="4s" repeatCount="indefinite" />
+      </rect>
+      <rect x="240" y="192" width="80" height="4" rx="2" fill="#06b6d4" opacity="0.6" />
+      <rect x="240" y="202" width="110" height="4" rx="2" fill="#06b6d4" opacity="0.4" />
+      <rect x="240" y="212" width="90" height="4" rx="2" fill="#06b6d4" opacity="0.5" />
+      <rect x="240" y="222" width="100" height="4" rx="2" fill="#06b6d4" opacity="0.3" />
+      <rect x="240" y="232" width="70" height="4" rx="2" fill="#06b6d4" opacity="0.4" />
+      <rect x="240" y="242" width="120" height="4" rx="2" fill="#06b6d4" opacity="0.5" />
+
+      {/* Arrow from AI to docs */}
+      <line x1="200" y1="115" x2="230" y2="175" stroke="#8b5cf6" strokeWidth="1.5" strokeDasharray="4 3">
+        <animate attributeName="stroke-dashoffset" from="20" to="0" dur="2s" repeatCount="indefinite" />
+      </line>
+
+      {/* Second code block */}
+      <rect x="30" y="160" width="140" height="90" rx="8" fill="rgba(59,130,246,0.1)" stroke="#3b82f6" strokeWidth="1" opacity="0.5">
+        <animate attributeName="opacity" values="0.5;0.3;0.5" dur="5s" repeatCount="indefinite" />
+      </rect>
+      <rect x="35" y="170" width="70" height="4" rx="2" fill="#3b82f6" opacity="0.4" />
+      <rect x="35" y="180" width="100" height="4" rx="2" fill="#3b82f6" opacity="0.3" />
+      <rect x="45" y="190" width="60" height="4" rx="2" fill="#3b82f6" opacity="0.5" />
+      <rect x="45" y="200" width="85" height="4" rx="2" fill="#3b82f6" opacity="0.4" />
+      <rect x="35" y="210" width="55" height="4" rx="2" fill="#3b82f6" opacity="0.3" />
+
+      {/* Arrow from code2 to AI */}
+      <line x1="170" y1="205" x2="185" y2="115" stroke="#3b82f6" strokeWidth="1" strokeDasharray="4 3">
+        <animate attributeName="stroke-dashoffset" from="20" to="0" dur="2.5s" repeatCount="indefinite" />
+      </line>
+    </svg>
+  );
+}
+
+/* ── Animated SVG: Orbiting planets (How it works) ── */
+function OrbitAnimation() {
+  return (
+    <svg viewBox="0 0 300 300" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="orbitGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#60a5fa" />
+        </linearGradient>
+        <linearGradient id="orbitGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#8b5cf6" />
+          <stop offset="100%" stopColor="#a78bfa" />
+        </linearGradient>
+        <linearGradient id="orbitGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#06b6d4" />
+          <stop offset="100%" stopColor="#67e8f9" />
+        </linearGradient>
+      </defs>
+
+      {/* Center */}
+      <circle cx="150" cy="150" r="20" fill="url(#orbitGrad1)" opacity="0.9" />
+      <text x="150" y="154" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">Repo</text>
+
+      {/* Orbit paths */}
+      <ellipse cx="150" cy="150" rx="60" ry="60" fill="none" stroke="rgba(59,130,246,0.15)" strokeWidth="1" />
+      <ellipse cx="150" cy="150" rx="100" ry="100" fill="none" stroke="rgba(139,92,246,0.1)" strokeWidth="1" />
+      <ellipse cx="150" cy="150" rx="135" ry="135" fill="none" stroke="rgba(6,182,212,0.08)" strokeWidth="1" />
+
+      {/* Orbiting elements */}
+      <g>
+        <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="10s" repeatCount="indefinite" />
+        <circle cx="210" cy="150" r="12" fill="url(#orbitGrad1)" opacity="0.8" />
+        <text x="210" y="154" textAnchor="middle" fill="white" fontSize="7">1</text>
+      </g>
+      <g>
+        <animateTransform attributeName="transform" type="rotate" from="120 150 150" to="480 150 150" dur="14s" repeatCount="indefinite" />
+        <circle cx="250" cy="150" r="10" fill="url(#orbitGrad2)" opacity="0.7" />
+        <text x="250" y="154" textAnchor="middle" fill="white" fontSize="7">2</text>
+      </g>
+      <g>
+        <animateTransform attributeName="transform" type="rotate" from="240 150 150" to="0 150 150" dur="18s" repeatCount="indefinite" />
+        <circle cx="285" cy="150" r="8" fill="url(#orbitGrad3)" opacity="0.6" />
+        <text x="285" y="154" textAnchor="middle" fill="white" fontSize="7">3</text>
+      </g>
+    </svg>
+  );
+}
+
+/* ── Animated SVG: Terminal typing (CTA) ── */
+function TerminalAnimation() {
+  const [lines, setLines] = useState<string[]>([]);
+  const allLines = [
+    "$ repolens analyze ./my-project",
+    "✓ Repository cloned successfully",
+    "✓ Tech stack detected: React + Node.js",
+    "✓ Architecture mapped (23 files)",
+    "✓ Data flow documented",
+    "✓ API endpoints cataloged",
+    "✓ Dependency graph generated",
+    "✓ Glossary created (42 terms)",
+    "🎉 Documentation complete!",
+  ];
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < allLines.length) {
+        setLines((prev) => [...prev, allLines[i]]);
+        i++;
+      } else {
+        setTimeout(() => setLines([]), 2000);
+      }
+    }, 600);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <svg viewBox="0 0 500 280" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      {/* Terminal background */}
+      <rect x="0" y="0" width="500" height="280" rx="12" fill="rgba(0,0,0,0.6)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+      
+      {/* Terminal header */}
+      <rect x="0" y="0" width="500" height="32" rx="12" fill="rgba(255,255,255,0.05)" />
+      <rect x="0" y="20" width="500" height="12" fill="rgba(255,255,255,0.05)" />
+      
+      {/* Window controls */}
+      <circle cx="20" cy="16" r="6" fill="#ff5f57" />
+      <circle cx="40" cy="16" r="6" fill="#febc2e" />
+      <circle cx="60" cy="16" r="6" fill="#28c840" />
+      
+      {/* Terminal title */}
+      <text x="250" y="20" textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="11" fontFamily="monospace">repolens</text>
+
+      {/* Terminal content */}
+      {lines.map((line, i) => {
+        const color = (line || "").startsWith("$") ? "#60a5fa" : (line || "").includes("✓") ? "#34d399" : (line || "").includes("🎉") ? "#fbbf24" : "rgba(255,255,255,0.7)";
+        return (
+          <text
+            key={i}
+            x="20"
+            y={60 + i * 24}
+            fill={color}
+            fontSize="13"
+            fontFamily="monospace"
+            opacity="0"
+          >
+            {line}
+            <animate attributeName="opacity" from="0" to="1" dur="0.3s" fill="freeze" />
+          </text>
+        );
+      })}
+
+      {/* Blinking cursor */}
+      {lines.length > 0 && (
+        <rect
+          x={20 + (lines[lines.length - 1] || "").length * 7.8}
+          y={56 + (lines.length - 1) * 24}
+          width="8"
+          height="16"
+          fill="#60a5fa"
+          opacity="0.8"
+        >
+          <animate attributeName="opacity" values="0.8;0;0.8" dur="1s" repeatCount="indefinite" />
+        </rect>
+      )}
+    </svg>
+  );
+}
+
+/* ── Intersection Observer Hook ── */
+function useInView(threshold = 0.1) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+
+  return { ref, inView };
+}
+
+/* ── Feature Card ── */
+function FeatureCard({ icon: Icon, title, description, delay }: { icon: any; title: string; description: string; delay: number }) {
+  const { ref, inView } = useInView();
+  return (
+    <div
+      ref={ref}
+      className={`glass rounded-2xl p-6 transition-all duration-700 hover:glow-primary hover:scale-[1.02] ${
+        inView ? "animate-fade-in-up" : "opacity-0"
+      }`}
+      style={{ animationDelay: `${delay}ms`, animationFillMode: "backwards" }}
+    >
+      <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+        <Icon className="h-6 w-6 text-primary" />
+      </div>
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+/* ── Stat Counter ── */
+function StatCounter({ value, label, suffix = "" }: { value: number; label: string; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const { ref, inView } = useInView();
+
+  useEffect(() => {
+    if (!inView) return;
+    let start = 0;
+    const step = Math.ceil(value / 40);
+    const interval = setInterval(() => {
+      start += step;
+      if (start >= value) {
+        setCount(value);
+        clearInterval(interval);
+      } else {
+        setCount(start);
+      }
+    }, 30);
+    return () => clearInterval(interval);
+  }, [inView, value]);
+
+  return (
+    <div ref={ref} className="text-center">
+      <div className="text-4xl font-bold text-white mb-1">
+        {count.toLocaleString()}{suffix}
+      </div>
+      <div className="text-sm text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+/* ── Testimonial Card ── */
+function TestimonialCard({ name, role, content, delay }: { name: string; role: string; content: string; delay: number }) {
+  const { ref, inView } = useInView();
+  return (
+    <div
+      ref={ref}
+      className={`glass rounded-2xl p-6 transition-all duration-700 ${
+        inView ? "animate-fade-in-up" : "opacity-0"
+      }`}
+      style={{ animationDelay: `${delay}ms`, animationFillMode: "backwards" }}
+    >
+      <div className="flex items-center gap-1 mb-3">
+        {[...Array(5)].map((_, i) => (
+          <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+        ))}
+      </div>
+      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">"{content}"</p>
+      <div className="flex items-center gap-3">
+        <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+          {name[0]}
+        </div>
+        <div>
+          <div className="text-sm font-medium">{name}</div>
+          <div className="text-xs text-muted-foreground">{role}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main Landing Page ── */
+export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const heroRef = useInView(0.1);
+
+  const features = [
+    { icon: Cpu, title: "AI-Powered Analysis", description: "Advanced AI agents systematically analyze every file, understanding architecture patterns and data flows in your codebase." },
+    { icon: Layers, title: "Multi-File Documentation", description: "Generate comprehensive docs: Overview, File Breakdown, Data Flow, API Endpoints, Dependency Maps, and Glossaries." },
+    { icon: Zap, title: "6-Phase Pipeline", description: "Structured LangGraph pipeline ensures thorough analysis from repository intake to final documentation generation." },
+    { icon: GitBranch, title: "GitHub & Local Support", description: "Analyze any GitHub repository or local directory. Works with public and private repos via GitHub tokens." },
+    { icon: BarChart3, title: "Real-Time Progress", description: "Watch your analysis progress live with detailed phase tracking and streaming logs from the AI agent." },
+    { icon: FileText, title: "Markdown Output", description: "Clean, readable Markdown documentation ready for your wiki, README, or knowledge base." },
+  ];
+
+  const steps = [
+    { num: "01", title: "Paste Your Repo", description: "Enter a GitHub URL or local directory path. No setup required." },
+    { num: "02", title: "AI Analyzes", description: "Our 6-phase agent pipeline dissects every file and maps relationships." },
+    { num: "03", title: "Get Documentation", description: "Receive comprehensive, structured documentation in minutes." },
+  ];
+
+  const testimonials = [
+    { name: "Sarah Chen", role: "Senior Engineer at Stripe", content: "RepoLens saved me hours of onboarding time. I dropped in our monolith and got a clear architecture map in minutes." },
+    { name: "Marcus Rivera", role: "Open Source Maintainer", content: "The dependency maps and data flow docs are incredibly accurate. My contributors love the auto-generated docs." },
+    { name: "Aisha Patel", role: "Tech Lead at Vercel", content: "We use RepoLens for every new project acquisition. It's like having a senior architect read your codebase overnight." },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background overflow-hidden">
+      {/* ── Navigation ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 glass-strong">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Github className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+              RepoLens
+            </span>
+          </div>
+
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-sm text-muted-foreground hover:text-white transition-colors">Features</a>
+            <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-white transition-colors">How It Works</a>
+            <a href="#testimonials" className="text-sm text-muted-foreground hover:text-white transition-colors">Testimonials</a>
+            <Button
+              onClick={onGetStarted}
+              className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white rounded-xl px-6 shadow-lg shadow-blue-500/20"
+            >
+              Get Started Free
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Mobile menu toggle */}
+          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden glass-strong border-t border-white/5 px-6 py-4 space-y-3">
+            <a href="#features" className="block text-sm text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Features</a>
+            <a href="#how-it-works" className="block text-sm text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
+            <a href="#testimonials" className="block text-sm text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Testimonials</a>
+            <Button onClick={() => { onGetStarted(); setMobileMenuOpen(false); }} className="w-full bg-gradient-to-r from-blue-500 to-violet-500">
+              Get Started Free
+            </Button>
+          </div>
+        )}
+      </nav>
+
+      {/* ── Hero Section ── */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 bg-grid">
+        {/* Background effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl animate-float-delayed" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-conic from-blue-500/5 via-violet-500/5 to-cyan-500/5 animate-spin-slow" />
+        </div>
+
+        <div ref={heroRef.ref} className="relative z-10 max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left: Text */}
+          <div className={`space-y-8 ${heroRef.inView ? "animate-fade-in-up" : "opacity-0"}`}>
+            <Badge variant="outline" className="gap-2 border-primary/30 text-primary px-4 py-1.5">
+              <Sparkles className="h-3 w-3" />
+              AI-Powered Codebase Analysis
+            </Badge>
+
+            <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
+              Understand
+              <span className="block bg-gradient-to-r from-blue-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent animate-gradient">
+                Any Codebase
+              </span>
+              Instantly
+            </h1>
+
+            <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
+              Paste a GitHub URL or local path. Our AI agent systematically analyzes every file and generates comprehensive documentation — so you actually understand your projects.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <Button
+                onClick={onGetStarted}
+                size="lg"
+                className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white rounded-xl px-8 h-12 text-lg shadow-xl shadow-blue-500/25"
+              >
+                Start Analyzing
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button variant="outline" size="lg" className="rounded-xl px-6 h-12 text-lg glass">
+                <Play className="mr-2 h-4 w-4" />
+                Watch Demo
+              </Button>
+            </div>
+
+            {/* Social proof */}
+            <div className="flex items-center gap-4 pt-4">
+              <div className="flex -space-x-2">
+                {["#3b82f6", "#8b5cf6", "#06b6d4", "#f59e0b"].map((color, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-background" style={{ backgroundColor: color }} />
+                ))}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Trusted by <span className="text-white font-medium">2,000+</span> developers
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Network Animation */}
+          <div className={`relative ${heroRef.inView ? "animate-fade-in" : "opacity-0"}`} style={{ animationDelay: "400ms", animationFillMode: "backwards" }}>
+            <div className="relative aspect-square max-w-lg mx-auto">
+              {/* Morphing blob behind */}
+              <div className="absolute inset-4 bg-gradient-to-br from-blue-500/20 to-violet-500/20 animate-morph blur-xl" />
+              
+              {/* SVG animation */}
+              <div className="absolute inset-0">
+                <NetworkAnimation />
+              </div>
+
+              {/* Floating badges */}
+              <div className="absolute top-8 right-8 glass rounded-xl px-3 py-2 animate-float">
+                <div className="flex items-center gap-2 text-xs">
+                  <CheckCircle2 className="h-3 w-3 text-green-400" />
+                  <span className="text-muted-foreground">23 files analyzed</span>
+                </div>
+              </div>
+              <div className="absolute bottom-12 left-4 glass rounded-xl px-3 py-2 animate-float-delayed">
+                <div className="flex items-center gap-2 text-xs">
+                  <GitBranch className="h-3 w-3 text-violet-400" />
+                  <span className="text-muted-foreground">Architecture mapped</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+          <span className="text-xs text-muted-foreground">Scroll to explore</span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground rotate-90" />
+        </div>
+      </section>
+
+      {/* ── Stats Section ── */}
+      <section className="relative py-20 border-y border-white/5 bg-white/[0.01]">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <StatCounter value={50000} label="Repos Analyzed" suffix="+" />
+          <StatCounter value={2000} label="Happy Developers" suffix="+" />
+          <StatCounter value={98} label="Accuracy Rate" suffix="%" />
+          <StatCounter value={150} label="Avg. Files/Analysis" suffix="+" />
+        </div>
+      </section>
+
+      {/* ── Features Section ── */}
+      <section id="features" className="relative py-32 bg-grid">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/5 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="gap-2 border-primary/30 text-primary mb-4">
+              <Zap className="h-3 w-3" />
+              Powerful Features
+            </Badge>
+            <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+              Everything You Need to
+              <span className="block bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+                Understand Code
+              </span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              From initial intake to final documentation, RepoLens handles the heavy lifting so you can focus on building.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            {features.map((f, i) => (
+              <FeatureCard key={i} {...f} delay={i * 100} />
+            ))}
+          </div>
+
+          {/* Code analysis animation */}
+          <div className="glass rounded-2xl p-8 max-w-4xl mx-auto">
+            <div className="aspect-[4/3] max-h-[300px]">
+              <CodeAnalysisAnimation />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ── */}
+      <section id="how-it-works" className="relative py-32">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-violet-500/5 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="gap-2 border-primary/30 text-primary mb-4">
+              <Layers className="h-3 w-3" />
+              Simple Process
+            </Badge>
+            <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+              Three Steps to
+              <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+                {" "}Clarity
+              </span>
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Steps */}
+            <div className="space-y-8">
+              {steps.map((step, i) => {
+                const { ref, inView } = useInView();
+                return (
+                  <div
+                    key={i}
+                    ref={ref}
+                    className={`flex gap-6 transition-all duration-700 ${
+                      inView ? "animate-fade-in-up" : "opacity-0"
+                    }`}
+                    style={{ animationDelay: `${i * 200}ms`, animationFillMode: "backwards" }}
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center">
+                        <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+                          {step.num}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                      <p className="text-muted-foreground">{step.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Orbit animation */}
+            <div className="flex justify-center">
+              <div className="w-80 h-80">
+                <OrbitAnimation />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Terminal / Demo Section ── */}
+      <section className="relative py-32 bg-grid">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-cyan-500/5 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+          <Badge variant="outline" className="gap-2 border-primary/30 text-primary mb-4">
+            <Terminal className="h-3 w-3" />
+            See It In Action
+          </Badge>
+          <h2 className="text-4xl lg:text-5xl font-bold mb-8">
+            Lightning Fast
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              {" "}Analysis
+            </span>
+          </h2>
+          <div className="glass rounded-2xl p-4 max-w-3xl mx-auto">
+            <div className="aspect-[500/280] max-h-[280px]">
+              <TerminalAnimation />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ── */}
+      <section id="testimonials" className="relative py-32">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="gap-2 border-primary/30 text-primary mb-4">
+              <MessageSquare className="h-3 w-3" />
+              Loved by Developers
+            </Badge>
+            <h2 className="text-4xl lg:text-5xl font-bold">
+              What People Are Saying
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((t, i) => (
+              <TestimonialCard key={i} {...t} delay={i * 150} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Section ── */}
+      <section className="relative py-32 bg-grid">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-blue-500/10 to-violet-500/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          <div className="glass-strong rounded-3xl p-12 lg:p-16 glow-primary">
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <Shield className="h-5 w-5 text-green-400" />
+              <span className="text-sm text-muted-foreground">Free to use • No credit card required</span>
+            </div>
+            <h2 className="text-4xl lg:text-6xl font-bold mb-6">
+              Ready to Understand
+              <span className="block bg-gradient-to-r from-blue-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent animate-gradient">
+                Your Codebase?
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
+              Join thousands of developers who use RepoLens to gain instant clarity on any project.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button
+                onClick={onGetStarted}
+                size="lg"
+                className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white rounded-xl px-10 h-14 text-lg shadow-xl shadow-blue-500/25"
+              >
+                <Sparkles className="mr-2 h-5 w-5" />
+                Start Free Analysis
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-6 mt-10 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-green-400" />
+                GitHub & Local repos
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-green-400" />
+                6-phase AI pipeline
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-green-400" />
+                Markdown output
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-white/5 py-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
+                  <Github className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+                  RepoLens
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
+                AI-powered codebase reverse-documentation. Understand any project in minutes, not days.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
+                <li><a href="#testimonials" className="hover:text-white transition-colors">Testimonials</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-white transition-colors flex items-center gap-1"><Github className="h-3 w-3" /> GitHub</a></li>
+                <li><a href="#" className="hover:text-white transition-colors flex items-center gap-1"><Globe className="h-3 w-3" /> Documentation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors flex items-center gap-1"><Code2 className="h-3 w-3" /> API</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2025 RepoLens. AI Codebase Reverse-Documentation Agent.
+            </p>
+            <div className="flex items-center gap-4">
+              <a href="#" className="text-muted-foreground hover:text-white transition-colors">
+                <Github className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-white transition-colors">
+                <MessageSquare className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

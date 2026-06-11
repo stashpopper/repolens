@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+.venv/
+.env
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Proposals / docs
+PROJECT_PROPOSAL.md
+SETUP.md
+TODO.md
+
+# Secrets (never commit)
+.env
+.env.local
+*.key
+*.pem
+
+# Supabase
+supabase.txt
+supabase/.temp/
+!supabase/migrations/

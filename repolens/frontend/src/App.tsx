@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { RepoInput } from "@/components/RepoInput";
 import { ProgressDashboard } from "@/components/ProgressDashboard";
 import { DocViewer } from "@/components/DocViewer";
+import { LandingPage } from "@/components/LandingPage";
 import { startAnalysis, getHistory } from "@/lib/api";
-import { ArrowLeft, Github, Sparkles, History, ExternalLink } from "lucide-react";
+import { ArrowLeft, Github, History, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-type View = "input" | "progress" | "docs" | "history";
+type View = "landing" | "input" | "progress" | "docs" | "history";
 
 interface HistoryItem {
   id: string;
@@ -21,16 +22,15 @@ interface HistoryItem {
 }
 
 function App() {
-  const [view, setView] = useState<View>("input");
+  const [view, setView] = useState<View>("landing");
   const [analysisId, setAnalysisId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
-  // Support URL-based navigation: #/analysis/<id> or #/history
+  // Support URL-based navigation
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      // Check analysis route first (more specific)
       if (hash.startsWith("#/analysis/")) {
         const id = hash.replace("#/analysis/", "");
         setAnalysisId(id);
@@ -38,13 +38,14 @@ function App() {
       } else if (hash === "#/history") {
         setView("history");
         loadHistory();
+      } else if (hash === "#/app" || hash === "#/new") {
+        setView("input");
+      } else if (hash === "") {
+        setView("landing");
       } else {
-        // Default to history view
-        setView("history");
-        loadHistory();
+        setView("landing");
       }
     };
-    // Run immediately on mount
     handleHashChange();
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
@@ -60,11 +61,11 @@ function App() {
   };
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { variant: string; label: string }> = {
-      completed: { variant: "default" as const, label: "Completed" },
-      running: { variant: "secondary" as const, label: "Running" },
-      failed: { variant: "destructive" as const, label: "Failed" },
-      pending: { variant: "outline" as const, label: "Pending" },
+    const config: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; label: string }> = {
+      completed: { variant: "default", label: "Completed" },
+      running: { variant: "secondary", label: "Running" },
+      failed: { variant: "destructive", label: "Failed" },
+      pending: { variant: "outline", label: "Pending" },
     };
     const c = config[status] || config.pending;
     return <Badge variant={c.variant}>{c.label}</Badge>;
@@ -85,7 +86,12 @@ function App() {
   const navigateToInput = () => {
     setView("input");
     setAnalysisId("");
-    window.location.hash = "";
+    window.location.hash = "#/new";
+  };
+
+  const navigateToApp = () => {
+    setView("input");
+    window.location.hash = "#/app";
   };
 
   const handleStartAnalysis = async (
@@ -116,29 +122,33 @@ function App() {
     setView("docs");
   };
 
-  const handleBackToInput = () => {
-    setView("input");
-    setAnalysisId("");
-  };
+
+
+  // Show landing page
+  if (view === "landing") {
+    return <LandingPage onGetStarted={navigateToApp} />;
+  }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <Github className="h-5 w-5 text-primary-foreground" />
+      <header className="border-b border-white/5 bg-card/30 backdrop-blur-xl supports-[backdrop-filter]:bg-card/30 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => { window.location.hash = ""; }}>
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Github className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold">RepoLens</h1>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+              RepoLens
+            </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={navigateToHistory}>
+            <Button variant="ghost" size="sm" onClick={navigateToHistory} className="text-muted-foreground hover:text-white">
               <History className="mr-2 h-4 w-4" />
               History
             </Button>
             {view !== "input" && (
-              <Button variant="ghost" size="sm" onClick={navigateToInput}>
+              <Button variant="ghost" size="sm" onClick={navigateToInput} className="text-muted-foreground hover:text-white">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 New Analysis
               </Button>
@@ -148,10 +158,10 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="flex-1 max-w-7xl mx-auto px-6 py-8 w-full">
         {view === "input" && (
-          <div className="flex flex-col items-center gap-8">
-            <div className="text-center space-y-2 max-w-xl">
+          <div className="flex flex-col items-center gap-8 animate-fade-in-up">
+            <div className="text-center space-y-3 max-w-xl">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Sparkles className="h-5 w-5 text-primary" />
                 <span className="text-sm font-medium text-primary">AI-Powered Analysis</span>
@@ -160,7 +170,7 @@ function App() {
                 Understand Your Codebase
               </h2>
               <p className="text-muted-foreground">
-                Paste a GitHub URL or point to a local directory. Our AI agent systematically analyzes every file and generates comprehensive documentation — so you actually understand your projects.
+                Paste a GitHub URL or point to a local directory. Our AI agent systematically analyzes every file and generates comprehensive documentation.
               </p>
             </div>
             <RepoInput onSubmit={handleStartAnalysis} isLoading={isLoading} />
@@ -168,27 +178,47 @@ function App() {
         )}
 
         {view === "progress" && (
-          <ProgressDashboard analysisId={analysisId} onComplete={handleAnalysisComplete} />
+          <div className="animate-fade-in-up">
+            <ProgressDashboard analysisId={analysisId} onComplete={handleAnalysisComplete} />
+          </div>
         )}
 
-        {view === "docs" && <DocViewer analysisId={analysisId} />}
+        {view === "docs" && (
+          <div className="animate-fade-in-up">
+            <DocViewer analysisId={analysisId} />
+          </div>
+        )}
 
         {view === "history" && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Analysis History</h2>
+          <div className="space-y-6 animate-fade-in-up">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Analysis History</h2>
+              <Button variant="outline" size="sm" onClick={navigateToInput}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                New Analysis
+              </Button>
+            </div>
             {history.length === 0 ? (
-              <p className="text-muted-foreground">No analyses yet.</p>
+              <div className="glass rounded-2xl p-12 text-center">
+                <Github className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">No analyses yet.</p>
+                <Button onClick={navigateToInput} className="bg-gradient-to-r from-blue-500 to-violet-500">
+                  Start Your First Analysis
+                </Button>
+              </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {history.map((item) => (
                   <Card
                     key={item.id}
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
+                    className="cursor-pointer glass hover:glow-primary transition-all duration-300 hover:scale-[1.01] rounded-xl"
                     onClick={() => navigateToAnalysis(item.id)}
                   >
                     <CardContent className="flex items-center justify-between py-4">
                       <div className="flex items-center gap-3">
-                        <Github className="h-5 w-5 text-muted-foreground" />
+                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                          <Github className="h-5 w-5 text-primary" />
+                        </div>
                         <div>
                           <p className="font-medium">{item.repo_url}</p>
                           <p className="text-sm text-muted-foreground">
@@ -213,7 +243,7 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-6 mt-auto">
+      <footer className="border-t border-white/5 py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-6 text-center text-sm text-muted-foreground">
           RepoLens — AI Codebase Reverse-Documentation Agent
         </div>
