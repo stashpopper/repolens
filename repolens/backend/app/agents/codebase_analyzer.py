@@ -16,7 +16,7 @@ from app.services.storage import StorageService
 from app.schemas.docs_output import DocsOutput
 from app.agents.prompts import (
     PHASE_1_INTRO, PHASE_2_INTRO, PHASE_3_INTRO,
-    PHASE_4_INTRO, PHASE_5_INTRO, PHASE_6_INTRO,
+    PHASE_4_INTRO, PHASE_5_INTRO, PHASE_6_PROMPTS,
 )
 
 logger = logging.getLogger(__name__)
@@ -313,8 +313,8 @@ def phase_1_intake(state: AnalysisState) -> AnalysisState:
         ]
         prioritized = [f for f in files if Path(f["relative_path"]).name in priority_names]
         remaining = [f for f in files if Path(f["relative_path"]).name not in priority_names]
-        # Take all priority files + fill remaining up to 100
-        files = prioritized + remaining[:max(0, 100 - len(prioritized))]
+        # Take all priority files + fill remaining up to 150
+        files = prioritized + remaining[:max(0, 150 - len(prioritized))]
         _write_log(analysis_id, 1, f"Prioritized {len(prioritized)} important files, total: {len(files)}")
 
         state["file_list"] = files
@@ -522,18 +522,19 @@ def phase_4_analyze_files(state: AnalysisState) -> AnalysisState:
             for file_info in sorted_files:
                 file_path = Path(file_info["path"])
                 content = repo_manager.read_file_content(file_path)
-                # Skip very large files (>50KB) to avoid context overflow
-                if len(content) > 50000:
+                # Skip very large files (>80KB) to avoid context overflow
+                if len(content) > 80000:
+                    files_content += f"\n### {file_info['relative_path']}\n[File too large to analyze - {len(content)} chars]\n"
                     continue
                 files_content += f"\n### {file_info['relative_path']}\n```{file_info['relative_path'].split('.')[-1]}\n{content}\n```\n"
                 read_count += 1
-                if read_count >= 30:  # Increased limit per group
-                    if len(files) > 30:
-                        files_content += f"\n... ({len(files) - 30} additional files not shown)\n"
+                if read_count >= 50:  # Increased from 30 to 50
+                    if len(files) > 50:
+                        files_content += f"\n... ({len(files) - 50} additional files not shown)\n"
                     break
 
             prompt = PHASE_4_INTRO.format(
-                phase3_summary=f"Architecture: {state.get('architecture_summary', '')[:200]}...",
+                phase3_summary=f"Architecture: {state.get('architecture_summary', '')[:800]}...",
                 group_name=group_name,
                 files_content=files_content,
             )
@@ -569,14 +570,14 @@ def phase_5_data_flow(state: AnalysisState) -> AnalysisState:
             state.get("api_key"),
         )
 
-        # Build comprehensive Phase 4 context for Phase 5
+        # Build comprehensive Phase 4 context for Phase 5 — pass full analysis
         phase4_groups_summary = "\n\n".join(
-            f"=== {group} ===\n{analysis[:1500]}"  # Truncate each group
+            f"=== {group} ===\n{analysis}"
             for group, analysis in state.get("file_analyses", {}).items()
         )
 
         prompt = PHASE_5_INTRO.format(
-            phase4_summary=f"Analyzed {len(state.get('file_analyses', {}))} file groups with detailed breakdowns.\n\n{phase4_groups_summary[:5000]}",
+            phase4_summary=f"Analyzed {len(state.get('file_analyses', {}))} file groups with detailed breakdowns.\n\n{phase4_groups_summary}",
         )
 
         response = llm.invoke([HumanMessage(content=prompt)])
@@ -595,9 +596,9 @@ def phase_5_data_flow(state: AnalysisState) -> AnalysisState:
     return _update_state(state, {"progress": 90})
 
 
-# Phase 6: Generate Docs
+# Phase 6: Generate Docs — one section per LLM call
 def phase_6_generate_docs(state: AnalysisState) -> AnalysisState:
-    """Generate final multi-file documentation using structured output."""
+    """Generate final multi-file documentation — each section gets its own LLM call with full context."""
     analysis_id = state["analysis_id"]
     _write_log(analysis_id, 6, "Starting Phase 6: Generating documentation...")
     SupabaseService.update_analysis_progress(analysis_id, 6, 95)
@@ -610,12 +611,11 @@ def phase_6_generate_docs(state: AnalysisState) -> AnalysisState:
 
         storage = StorageService()
 
-        # Build focused context for Phase 6 — keep it under ~8000 chars total
-        # to ensure the LLM output fits within token limits
+        # Build FULL context for Phase 6 — no truncation, pass everything
         tech_stack_json = json.dumps(state.get("tech_stack", {}), indent=2)
         phase4_groups = list(state.get("file_analyses", {}).keys())
         phase4_details = "\n\n".join(
-            f"## {group}\n{analysis[:500]}"  # Reduced from 1000 to fit more groups
+            f"## {group}\n{analysis}"
             for group, analysis in state.get("file_analyses", {}).items()
         )
 
@@ -623,64 +623,51 @@ def phase_6_generate_docs(state: AnalysisState) -> AnalysisState:
 {tech_stack_json}
 
 === ARCHITECTURE (Phase 3) ===
-{state.get('architecture_summary', 'No architecture summary available.')[:1500]}
+{state.get('architecture_summary', 'No architecture summary available.')}
 
 === FILE ANALYSES (Phase 4) ===
 Groups analyzed: {', '.join(phase4_groups)}
-{phase4_details[:4000]}
+{phase4_details}
 
 === DATA FLOW (Phase 5) ===
-{state.get('data_flow', 'No data flow analysis available.')[:1500]}"""
+{state.get('data_flow', 'No data flow analysis available.')}"""
 
-        prompt = PHASE_6_INTRO.format(
-            phase6_full_context=phase6_context,
-        )
+        docs = {}
+        doc_filenames = list(PHASE_6_PROMPTS.keys())
 
-        # Strategy 1: Try structured output first
-        docs = None
-        parsing_error = None
+        for idx, filename in enumerate(doc_filenames):
+            prompt_template = PHASE_6_PROMPTS[filename]
+            prompt = prompt_template.format(phase6_full_context=phase6_context)
 
-        try:
-            structured_llm = llm.with_structured_output(DocsOutput, include_raw=True)
-            raw = structured_llm.invoke([HumanMessage(content=prompt)])
-            docs_output = raw.get('parsed')
-            if docs_output:
-                docs = {
-                    "01_PROJECT_OVERVIEW.md": docs_output.project_overview,
-                    "02_FILE_BREAKDOWN.md": docs_output.file_breakdown,
-                    "03_DATA_FLOW.md": docs_output.data_flow,
-                    "04_API_ENDPOINTS.md": docs_output.api_endpoints,
-                    "05_DEPENDENCY_MAP.md": docs_output.dependency_map,
-                    "06_GLOSSARY.md": docs_output.glossary,
-                }
-        except Exception as e:
-            parsing_error = str(e)
-            logger.warning(f"Structured output failed, falling back to raw parsing: {e}")
+            _write_log(analysis_id, 6, f"Generating {filename} ({idx+1}/{len(doc_filenames)})...")
 
-        # Strategy 2: Fallback to raw LLM call + robust JSON parsing
-        if docs is None:
-            _write_log(analysis_id, 6, "Falling back to raw LLM call with robust JSON parsing...")
-            raw_response = llm.invoke([HumanMessage(content=prompt)])
             try:
-                parsed = _parse_phase6_json(raw_response)
-                docs = {
-                    "01_PROJECT_OVERVIEW.md": parsed.get("01_PROJECT_OVERVIEW.md", ""),
-                    "02_FILE_BREAKDOWN.md": parsed.get("02_FILE_BREAKDOWN.md", ""),
-                    "03_DATA_FLOW.md": parsed.get("03_DATA_FLOW.md", ""),
-                    "04_API_ENDPOINTS.md": parsed.get("04_API_ENDPOINTS.md", ""),
-                    "05_DEPENDENCY_MAP.md": parsed.get("05_DEPENDENCY_MAP.md", ""),
-                    "06_GLOSSARY.md": parsed.get("06_GLOSSARY.md", ""),
-                }
-            except Exception as e2:
-                raise ValueError(
-                    f"Both structured and raw parsing failed. "
-                    f"Structured: {parsing_error}. Raw: {str(e2)}"
-                ) from e2
+                response = llm.invoke([HumanMessage(content=prompt)])
+                content = response.content.strip()
 
-        # Save each doc file
-        for filename, content in docs.items():
-            storage.write_doc(analysis_id, filename, content)
-            _write_log(analysis_id, 6, f"Generated {filename}")
+                # Clean up any markdown code fences the LLM might wrap around
+                if content.startswith("```"):
+                    lines = content.split("\n")
+                    # Remove first line if it's ``` or ```markdown or ```md
+                    if lines[0].strip() in ("```", "```markdown", "```md"):
+                        lines = lines[1:]
+                    # Remove last line if it's ```
+                    if lines and lines[-1].strip() == "```":
+                        lines = lines[:-1]
+                    content = "\n".join(lines)
+
+                docs[filename] = content
+                storage.write_doc(analysis_id, filename, content)
+                _write_log(analysis_id, 6, f"Generated {filename} ({len(content)} chars)")
+
+            except Exception as e:
+                _write_log(analysis_id, 6, f"ERROR generating {filename}: {str(e)}")
+                docs[filename] = f"# {filename.replace('.md', '').replace('_', ' ').title()}\n\nFailed to generate this section."
+                storage.write_doc(analysis_id, filename, docs[filename])
+
+            # Update progress
+            progress = 95 + int(5 * ((idx + 1) / len(doc_filenames)))
+            SupabaseService.update_analysis_progress(analysis_id, 6, progress)
 
         state["generated_docs"] = docs
         state["progress"] = 100
